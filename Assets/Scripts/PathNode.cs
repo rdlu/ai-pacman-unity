@@ -183,4 +183,25 @@ public class PathNode : System.IEquatable<PathNode> {
 		
 		
 	}
+	
+	//Procura o Pellet mais proximo deste no usando BFS
+	public PathNode bfs_pellet() {
+		Queue<PathNode> queue = new Queue<PathNode>();
+		HashSet<PathNode> V = new HashSet<PathNode>();
+		
+		queue.Enqueue(this); V.Add(this);
+		while(queue.Count > 0) {
+			PathNode t = queue.Dequeue();
+			if(t.Pellet != null) {
+				return t;
+			}
+			foreach(PathNode connection in this.Connections) {
+				if(!V.Contains(connection)) { //is not in set V
+					V.Add(connection);
+					queue.Enqueue(connection);
+				}
+			}
+		}
+		return null;
+	}
 }
