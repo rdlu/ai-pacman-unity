@@ -13,31 +13,31 @@ using System.Collections.Generic;
 public class PacMan_Controller : Eat_Pellet {
     
 	//indica a primeira execucao. Usada no controle das atribuicoes do algoritmo
-    bool firstRun;
+    protected bool firstRun;
     
 	//vetor com as direcoes em que o pacman sera movido
-    Vector3 moveDirection;
+    protected Vector3 moveDirection;
     
 	//o objeto de jogo do pacman
-    GameObject pacMan;
+    protected GameObject pacMan;
     
 	//instancia para a classe A_Star
-    A_Star aStar;
+    protected A_Star aStar;
     
 	//lista com o melhor caminho escolhido pelo A_Star
-    List<PathNode> bestPath;
+    protected List<PathNode> bestPath;
 	
 	//ultimo no que foi recuperado da lista com o melhor caminho escolhido pelo A_Star
-    PathNode lastNode;
+    protected PathNode lastNode;
     
     //indice da camada do terreno
-    int groundMask = 8;
+    protected int groundMask = 8;
 	
 	//momento do proximo update
-	float nextUpdate;
+	protected float nextUpdate;
 	
 	//Raycast eh o objeto utilizado na deteccao de colisoes no cenario
-    RaycastHit hit;
+    protected RaycastHit hit;
     
 	//distancia padrao da checagem do raycast para bloqueios nos eixos x e z
     public float rayBlockedDistX = 0.3f;
@@ -60,7 +60,7 @@ public class PacMan_Controller : Eat_Pellet {
     /// Chamada na inicializacao da classe pelo unity atraves da classe MonoBehaviour 
     /// (herdade aqui de Eat_Pellet). Inicia a instancia dessa classe.
     /// </summary>
-    void Start () {
+    protected void Start () {
             
         pacMan = this.gameObject; //caso o script nao esteja vinculado ao pacman
 		//eh possivel fazer GameObject.Find("PacMan");
@@ -195,7 +195,7 @@ public class PacMan_Controller : Eat_Pellet {
 	/// <summary>
 	/// Atualiza a deteccao das colisoes com objetos do cenario.
 	/// </summary>
-    void UpdateRaycasts(){
+    protected void UpdateRaycasts(){
         
 		//verifique se o personagem estah no bloqueado acima lancando dois raios de cada lado dele
         if (Physics.Raycast(new Vector3(transform.position.x-0.3f,transform.position.y,transform.position.z+0.3f), Vector3.up, out hit, rayBlockedDistZ) || 
@@ -245,7 +245,7 @@ public class PacMan_Controller : Eat_Pellet {
 	/// <param name='col'>
 	/// o colisor contra o qual o pacman colidiu
 	/// </param>
-    void Kill(Collider col){
+    protected void Kill(Collider col){
         
 		//se o pacman estah invencivel e colidiu contra um fantasma ativo e amendrotado na lista global
 		//com os colisores dos fantasmas

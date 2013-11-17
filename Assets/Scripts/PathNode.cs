@@ -190,18 +190,28 @@ public class PathNode : System.IEquatable<PathNode> {
 		HashSet<PathNode> V = new HashSet<PathNode>();
 		
 		queue.Enqueue(this); V.Add(this);
+		
 		while(queue.Count > 0) {
 			PathNode t = queue.Dequeue();
 			if(t.Pellet != null) {
+				//Debug.Log("Comida Encontrada!");
 				return t;
 			}
 			foreach(PathNode connection in this.Connections) {
-				if(!V.Contains(connection)) { //is not in set V
+				if(!V.Contains(connection)) {
 					V.Add(connection);
 					queue.Enqueue(connection);
 				}
 			}
 		}
 		return null;
+	}
+	
+	public Vector3 bfs_pellet_position() {
+		PathNode candidate = bfs_pellet();
+		if(candidate == null)
+			return new Vector3(0f,0f,0f);
+		else
+			return candidate.Position;
 	}
 }

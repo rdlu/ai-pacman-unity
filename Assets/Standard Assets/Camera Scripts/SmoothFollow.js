@@ -18,6 +18,11 @@ var height = 5.0;
 // How much we 
 var heightDamping = 2.0;
 var rotationDamping = 3.0;
+var wantedHeight : float;
+var currentHeight : float;
+var wantedRotationAngle : float;
+var currentRotationAngle : float;
+var currentRotation : Quaternion;
 
 // Place the script in the Camera-Control group in the component menu
 @script AddComponentMenu("Camera-Control/Smooth Follow")
