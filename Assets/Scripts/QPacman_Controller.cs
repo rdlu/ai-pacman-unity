@@ -19,6 +19,7 @@ public class QPacman_Controller : PacMan_Controller {
   protected float[] featuresWeights = new float[NUM_FEATURES];
   protected float[] lastActionFeatures = new float[NUM_FEATURES];
   protected GameObject[] ghosts;
+  protected PathNode bestNode = null;
 
   new protected void Start() {
     ghosts = GameObject.FindGameObjectsWithTag("Respawn");
@@ -41,28 +42,22 @@ public class QPacman_Controller : PacMan_Controller {
 
     // se a IA esta ligada
     if (IA_ON) {
-
-      //se por acaso o melhor caminho for nulo, instancie.
-      if (bestPath == null)
-        bestPath = new List<PathNode>();
-
-      //se o caminho estah vazio ou se jah eh o momento do proximo update e
-      //a distancia da posicao atual do pacam a do ultimo no recuperado eh menor que 0.3
-      if (bestPath.Count == 0 ||
-        (Time.time > nextUpdate && Vector3.Distance(pacMan.transform.position, lastNode.Position) < .3f) ||
+      if (true || bestNode == null ||
         (Random.value > (1f - EXPLORATION_PROBABILITY))) {
-    
-        bestPath = explore();
-
+          Debug.Log("Explorando");
+          bestNode = explore();
       }
       else {
-        bestPath = move();
+        Debug.Log("Movendo");
+        bestNode = move();
       }
+
+      Debug.Log("Melhor Nodo "+bestNode.Position);
 
       //se a lista do melhor caminho nao eh nula e contem elementos
       //atribua o primeiro elemento ao ultimo no sendo deslocado
-      if (bestPath != null && bestPath.Count > 0)
-        lastNode = bestPath[0];
+      if (bestNode != null)
+        lastNode = bestNode;
 
       //calcule x e z como a diferenca entre o ponto atual do pacman e
       //onde se quer chegar
@@ -85,14 +80,6 @@ public class QPacman_Controller : PacMan_Controller {
 
       //mova o personagem na direcao do proximo ponto em funcao do tempo do ultimo frame
       controller.Move(moveDirection * Time.deltaTime);
-
-      //se a distancia da posicao atual do pacam a do 
-      //ultimo no recuperado eh menor que 0.3
-      if (Vector3.Distance(controller.transform.position, lastNode.Position) < .3f) {
-        //remova o primeiro no da lista
-        bestPath.RemoveAt(0);
-
-      }
       //se a IA esta desligada, o usuario controla o pacman             
     }
     else {
@@ -123,33 +110,35 @@ public class QPacman_Controller : PacMan_Controller {
 
   }
 
-  protected List<PathNode> explore() {
+  protected PathNode explore() {
     //se nao eh a primeira execucao e nao eh possivel reiniciar a busca
-    if (!firstRun && !aStar.canReset(pacMan.transform)) {
+    if (!firstRun) {
       //coloque o pacman na posicao do ultimo no lido
       pacMan.transform.position = lastNode.Position;
     }
+    //no de retorno
+    PathNode nodeD = null;
 
-    //reinstancie o A* com a posicao atual do pacman
-    aStar = new A_Star(pacMan.transform, true);
+    //faca
+    do {
+      //recupere os nos do labirinto
+      List<PathNode> nodes = Global.nodes;
 
-    //escolha um novo proximo estado ao acaso
-    aStar.NextState = aStar.chooseRandomState();
+      //escolha ao acaso um indice da arvore de nos do labirinto
+      //subtraia um do tamanho (posicoes validas vao d 0 a count-1)
+      int index = (int)(Random.value * (nodes.Count - 1));
 
-    //remova o comentario se quiser visualizar a escolha 
-    //dinamica de novas origens e destinos
-    //Debug.Log("Origem: " + pacMan.transform.position);	
-    //if(Time.time > nextUpdate)
-    //	Debug.Log("Proximo! " + aStar.NextState.Position);
+      //atribua o no do indice ao no de retorno
+      nodeD = nodes[index];
+    }
+    //enquanto o no de retorno for uma parede
+    while (nodeD.Wall);
 
-    //atualize o momento do proximo update				
-    nextUpdate = Time.time + update;
-
-    //encontre o melhor caminho
-    return aStar.findBestPath();
+    //retorne o no selecionado
+    return nodeD;
   }
 
-  protected List<PathNode> move() {
+  protected PathNode move() {
     PathNode choosenNode = null;
     if (lastNode != null) {
       //Debug.Log ("Conexoes: "+lastNode.Connections.Count);
@@ -165,7 +154,7 @@ public class QPacman_Controller : PacMan_Controller {
 
     List<PathNode> ret = new List<PathNode>();
     ret.Add(choosenNode);
-    return ret;
+    return choosenNode;
   }
 
   protected float getQValue(float[] featuresValues) {
