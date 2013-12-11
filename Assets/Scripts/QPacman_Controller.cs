@@ -284,11 +284,35 @@ public class QPacman_Controller : PacMan_Controller {
 			reward(rewardSuperPellet,maxQValue);
 			//ative a invencibilidade do pacman
 			Global.UPGRADE = true;
+		} else {
+			Debug.Log("Alguem estranho "+other.name);
 		}
 
 		
 		//destrua o objeto deste colisor
 		Destroy(other.gameObject);
+	}
+
+	protected override void Kill(Collider col){
+
+		List<PathNode> nos = Global.nodes;
+		Vector3 position = col.gameObject.transform.position;
+		PathNode currentNode = Global.findClosestNode(position, nos);
+		
+		float maxQValue = float.MinValue;
+		foreach (PathNode conn in currentNode.ValidConnections) {
+			float[] currentFeatures = buildFeaturesList(conn);
+			float currentQValue = getQValue(currentFeatures);
+			maxQValue = (currentQValue > maxQValue) ? currentQValue : maxQValue;
+		}
+
+		if(Global.UPGRADE) {
+			reward(rewardGhostFear,maxQValue);
+		} else {
+			reward(rewardGhostKill,maxQValue);
+		}
+
+		base.Kill(col);
 	}
 
 

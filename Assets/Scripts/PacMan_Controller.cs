@@ -245,7 +245,7 @@ public class PacMan_Controller : Eat_Pellet {
 	/// <param name='col'>
 	/// o colisor contra o qual o pacman colidiu
 	/// </param>
-    protected void Kill(Collider col){
+    protected virtual void Kill(Collider col){
         
 		//se o pacman estah invencivel e colidiu contra um fantasma ativo e amendrotado na lista global
 		//com os colisores dos fantasmas
