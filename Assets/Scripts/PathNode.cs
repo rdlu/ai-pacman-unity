@@ -28,7 +28,7 @@ public class PathNode : System.IEquatable<PathNode> {
 	
 	//lista as conexoes deste no com seus 
 	//pontos diretamente adjacentes
-	List<PathNode> connections;
+	public List<PathNode> connections;
 	
 	/// <summary>
 	/// Inicializa uma nova instancia de PathNode
@@ -72,6 +72,14 @@ public class PathNode : System.IEquatable<PathNode> {
 	public List<PathNode> Connections{
 		get{return connections;}
 		//set{connections = value;}
+	}
+
+	public List<PathNode> ValidConnections{
+		get{ return connections.FindAll(matchWall); }
+	}
+
+	public Boolean matchWall(PathNode p) {
+		return p.isWall;
 	}
 	
 	/// <summary>

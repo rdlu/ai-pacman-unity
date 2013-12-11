@@ -4,13 +4,12 @@
 SceneSettings:
   m_ObjectHideFlags: 0
   m_PVSData: 
-  m_QueryMode: 1
   m_PVSObjectsArray: []
   m_PVSPortalsArray: []
   m_OcclusionBakeSettings:
-    viewCellSize: 1
-    bakeMode: 2
-    memoryUsage: 10485760
+    smallestOccluder: 5
+    smallestHole: .25
+    backfaceThreshold: 100
 --- !u!196 &2
 NavMeshSettings:
   m_ObjectHideFlags: 0
@@ -38,6 +37,7 @@ RenderSettings:
   m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: .5
   m_FlareStrength: 1
+  m_FlareFadeSpeed: 3
   m_HaloTexture: {fileID: 0}
   m_SpotCookie: {fileID: 0}
   m_ObjectHideFlags: 0
@@ -110,6 +110,9 @@ Renderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortingLayerID: 0
 --- !u!64 &61
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -336,6 +339,7 @@ Camera:
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_HDR: 0
+  m_OcclusionCulling: 1
 --- !u!4 &97
 Transform:
   m_ObjectHideFlags: 0
@@ -410,6 +414,9 @@ Renderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortingLayerID: 0
 --- !u!65 &109
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -524,6 +531,9 @@ Renderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortingLayerID: 0
 --- !u!65 &127
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -579,6 +589,9 @@ Renderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortingLayerID: 0
 --- !u!65 &135
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -650,6 +663,9 @@ Renderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortingLayerID: 0
 --- !u!114 &145
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -963,6 +979,9 @@ Renderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortingLayerID: 0
 --- !u!33 &254684511
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1041,6 +1060,9 @@ Renderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortingLayerID: 0
 --- !u!33 &455674659
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1130,6 +1152,9 @@ Renderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortingLayerID: 0
 --- !u!33 &753179099
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1219,6 +1244,9 @@ Renderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortingLayerID: 0
 --- !u!33 &757825542
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1247,7 +1275,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 789094957}
   - 143: {fileID: 789094956}
-  - 114: {fileID: 789094955}
+  - 114: {fileID: 789094958}
   m_Layer: 8
   m_Name: PacMan
   m_TagString: Untagged
@@ -1255,31 +1283,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &789094955
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 11400006, guid: 95a883d48cfa4d4448a42c40c3fbef27,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 789094954}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33d113a656f217f4885e0b89776cc978, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scoreDisplay: {fileID: 75}
-  smallPelletScore: 10
-  superPelletScore: 100
-  ghost: 200
-  rayBlockedDistX: .300000012
-  rayBlockedDistZ: .300000012
-  speed: 10
-  update: 5
-  gravity: 20
-  IA_ON: 1
-  EXPLORATION_PROBABILITY: .0500000007
-  LEARNING_RATE: .300000012
-  DISCOUNT_FACTOR: .800000012
 --- !u!143 &789094956
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1308,6 +1311,30 @@ Transform:
   - {fileID: 1477930957}
   - {fileID: 254684509}
   m_Father: {fileID: 0}
+--- !u!114 &789094958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 789094954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33d113a656f217f4885e0b89776cc978, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scoreDisplay: {fileID: 75}
+  smallPelletScore: 10
+  superPelletScore: 100
+  ghost: 200
+  rayBlockedDistX: .300000012
+  rayBlockedDistZ: .300000012
+  speed: 6
+  update: 3
+  gravity: 20
+  IA_ON: 1
+  EXPLORATION_PROBABILITY: .0500000007
+  LEARNING_RATE: .300000012
+  DISCOUNT_FACTOR: .800000012
 --- !u!1 &1477930956
 GameObject:
   m_ObjectHideFlags: 0
@@ -1414,6 +1441,7 @@ Camera:
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_HDR: 0
+  m_OcclusionCulling: 1
 --- !u!1 &1597048224
 GameObject:
   m_ObjectHideFlags: 0
@@ -1484,6 +1512,9 @@ Renderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortingLayerID: 0
 --- !u!33 &1597048229
 MeshFilter:
   m_ObjectHideFlags: 0

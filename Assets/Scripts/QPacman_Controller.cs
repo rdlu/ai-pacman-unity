@@ -112,27 +112,15 @@ public class QPacman_Controller : PacMan_Controller {
 
   protected PathNode explore() {
     //se nao eh a primeira execucao e nao eh possivel reiniciar a busca
-    if (!firstRun) {
-      //coloque o pacman na posicao do ultimo no lido
-      pacMan.transform.position = lastNode.Position;
-    }
-    //no de retorno
-    PathNode nodeD = null;
-
-    //faca
-    do {
-      //recupere os nos do labirinto
-      List<PathNode> nodes = Global.nodes;
-
-      //escolha ao acaso um indice da arvore de nos do labirinto
-      //subtraia um do tamanho (posicoes validas vao d 0 a count-1)
-      int index = (int)(Random.value * (nodes.Count - 1));
-
-      //atribua o no do indice ao no de retorno
-      nodeD = nodes[index];
-    }
-    //enquanto o no de retorno for uma parede
-    while (nodeD.Wall);
+		List<PathNode> nos = Global.nodes;
+		
+		Vector3 pacmanPos = this.gameObject.transform.position;
+    PathNode currentNode = Global.findClosestNode(pacmanPos, nos);
+	
+	//no de retorno
+		int randomConnNumber = (int) (Random.value * currentNode.ValidConnections.Count);
+		Debug.Log("Numero escolhido: "+randomConnNumber+"de: "+currentNode.ValidConnections.Count);
+		PathNode nodeD = currentNode.ValidConnections[randomConnNumber];
 
     //retorne o no selecionado
     return nodeD;
@@ -144,17 +132,18 @@ public class QPacman_Controller : PacMan_Controller {
       //Debug.Log ("Conexoes: "+lastNode.Connections.Count);
       float previousQValue = float.MinValue;
       foreach (PathNode conn in lastNode.Connections) {
-        //Debug.Log("S: "+lastNode.Position+"/ D: "+conn.Position);
+        Debug.Log("S: "+lastNode.Position+"/ D: "+conn.Position);
         float[] currentFeatures = buildFeaturesList(conn);
-        float currentQValue = getQValue(currentFeatures);
-        choosenNode = (currentQValue > previousQValue) ? conn : choosenNode;
-        lastActionFeatures = (currentQValue > previousQValue) ? currentFeatures : lastActionFeatures;
+        //float currentQValue = getQValue(currentFeatures);
+        //choosenNode = (currentQValue > previousQValue) ? conn : choosenNode;
+        //lastActionFeatures = (currentQValue > previousQValue) ? currentFeatures : lastActionFeatures;
       }
     }
 
-    List<PathNode> ret = new List<PathNode>();
-    ret.Add(choosenNode);
-    return choosenNode;
+    //List<PathNode> ret = new List<PathNode>();
+    //ret.Add(choosenNode);
+    //return choosenNode;
+		return null;
   }
 
   protected float getQValue(float[] featuresValues) {
@@ -172,12 +161,12 @@ public class QPacman_Controller : PacMan_Controller {
       float distance = Vector3.Distance(node.Position, ghost.transform.position);
       min_ghost_distance = (distance < min_ghost_distance) ? distance : min_ghost_distance;
     }
-    //Debug.Log("Distancia do Fantasma Mais Proximo: "+min_ghost_distance);
+    Debug.Log("Distancia do Fantasma Mais Proximo: "+min_ghost_distance);
     featuresList.Add(min_ghost_distance);
 
     //Distancia da comida
     float food_distance = Vector3.Distance(node.Position, node.bfs_pellet_position());
-    //Debug.Log("Distancia da COMIDA Mais Proxima: "+food_distance);
+    Debug.Log("Distancia da COMIDA Mais Proxima: "+food_distance);
     featuresList.Add(food_distance);
 
 
@@ -192,7 +181,7 @@ public class QPacman_Controller : PacMan_Controller {
       normalizedFeaturesList.Add(features / featuresSum);
     }
 
-    /* //Debug das duas listas
+     //Debug das duas listas
     string L1 = "";string L2 = "";
     foreach(float features in featuresList) {
       L1 += features.ToString()+" ";
@@ -201,7 +190,7 @@ public class QPacman_Controller : PacMan_Controller {
       L2 += nFeatures.ToString()+" ";
     }
     Debug.Log("Lista: "+L1+" | Normalizada: "+L2);
-    */
+    
     float[] normalizedFeaturesArray = normalizedFeaturesList.ToArray();
     if (normalizedFeaturesArray.Length != NUM_FEATURES)
       Debug.LogError("Número de features calculados diferentes do esperado", this);
