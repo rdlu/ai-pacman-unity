@@ -10,7 +10,7 @@ O....X.X.X...XXXX  XXXX...XXX.X.X.XX.X
 XXXX.X...X.X.X        X.X.X.X.X.X.XX.X
 X......X.X.X.X        X.X.X.....X.XX..
 XXXXXXXX.X.X.XXXXXXXXXX.X.XXXXX.X....X
-XX.X.X.....X..... ........XX......XXXX
+XX.X.X.....X....O O.......XX......XXXX
 XX.X.X.XXX.XXX.XXXXXXX.XX....XX.X..XXX
 ...X.X.XX..X.........X.XXXXXXXX.XX...X
 XX...X.XXXXXX.X.XXXXXX.X....OX...XXX.O

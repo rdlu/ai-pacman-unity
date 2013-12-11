@@ -288,6 +288,4 @@ public class PacMan_Controller : Eat_Pellet {
 		//fantasma e adicione ao placar
         base.score += numGhosts * base.ghost;
     }
-        
-        
 }

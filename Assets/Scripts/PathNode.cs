@@ -75,11 +75,11 @@ public class PathNode : System.IEquatable<PathNode> {
 	}
 
 	public List<PathNode> ValidConnections{
-		get{ return connections.FindAll(matchWall); }
+		get{ return connections.FindAll(matchNotWall); }
 	}
 
-	public Boolean matchWall(PathNode p) {
-		return p.isWall;
+	public Boolean matchNotWall(PathNode p) {
+		return !p.isWall;
 	}
 	
 	/// <summary>

@@ -47,7 +47,7 @@ public class Eat_Pellet : MonoBehaviour {
 	/// O objeto com o qual houve a colisao.
 	/// </param>
 	void OnTriggerEnter (Collider other) {
-		
+		Debug.Log("TRIGGER ERRADO");
 		//se o objeto era uma pelota
 	    if (other.name.Contains("BasicPellet")) {
 	        score += smallPelletScore;

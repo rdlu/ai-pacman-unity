@@ -17,9 +17,15 @@ public class QPacman_Controller : PacMan_Controller {
   protected static int NUM_FEATURES = 2;
 
   protected float[] featuresWeights = new float[NUM_FEATURES];
-  protected float[] lastActionFeatures = new float[NUM_FEATURES];
+  protected float[] lastActionFeatures;
   protected GameObject[] ghosts;
   protected PathNode bestNode = null;
+
+	//Valor das recompensas
+	protected float rewardPellet = 10f;
+	protected float rewardSuperPellet = 100f;
+	protected float rewardGhostKill = -5000f;
+	protected float rewardGhostFear = 500f;
 
   new protected void Start() {
     ghosts = GameObject.FindGameObjectsWithTag("Respawn");
@@ -42,17 +48,18 @@ public class QPacman_Controller : PacMan_Controller {
 
     // se a IA esta ligada
     if (IA_ON) {
-      if (true || bestNode == null ||
+			//bestNode = move();
+      if(bestNode == null ||
         (Random.value > (1f - EXPLORATION_PROBABILITY))) {
-          Debug.Log("Explorando");
+         // Debug.Log("Explorando");
           bestNode = explore();
       }
       else {
-        Debug.Log("Movendo");
+        //Debug.Log("Movendo");
         bestNode = move();
       }
 
-      Debug.Log("Melhor Nodo "+bestNode.Position);
+      //Debug.Log("Melhor Nodo "+bestNode.Position);
 
       //se a lista do melhor caminho nao eh nula e contem elementos
       //atribua o primeiro elemento ao ultimo no sendo deslocado
@@ -119,31 +126,37 @@ public class QPacman_Controller : PacMan_Controller {
 	
 	//no de retorno
 		int randomConnNumber = (int) (Random.value * currentNode.ValidConnections.Count);
-		Debug.Log("Numero escolhido: "+randomConnNumber+"de: "+currentNode.ValidConnections.Count);
+		//Debug.Log("Numero escolhido: "+randomConnNumber+"de: "+currentNode.ValidConnections.Count);
 		PathNode nodeD = currentNode.ValidConnections[randomConnNumber];
+
+		lastActionFeatures = buildFeaturesList(nodeD);
 
     //retorne o no selecionado
     return nodeD;
   }
 
   protected PathNode move() {
+		List<PathNode> nos = Global.nodes;
+		
+		Vector3 pacmanPos = this.gameObject.transform.position;
+		PathNode currentNode = Global.findClosestNode(pacmanPos, nos);
+
     PathNode choosenNode = null;
-    if (lastNode != null) {
       //Debug.Log ("Conexoes: "+lastNode.Connections.Count);
       float previousQValue = float.MinValue;
-      foreach (PathNode conn in lastNode.Connections) {
-        Debug.Log("S: "+lastNode.Position+"/ D: "+conn.Position);
+	  foreach (PathNode conn in currentNode.ValidConnections) {
+		//Debug.Log("S: "+currentNode.Position+"/ D: "+conn.Position);
         float[] currentFeatures = buildFeaturesList(conn);
-        //float currentQValue = getQValue(currentFeatures);
-        //choosenNode = (currentQValue > previousQValue) ? conn : choosenNode;
-        //lastActionFeatures = (currentQValue > previousQValue) ? currentFeatures : lastActionFeatures;
+        float currentQValue = getQValue(currentFeatures);
+        choosenNode = (currentQValue > previousQValue) ? conn : choosenNode;
+		previousQValue = (currentQValue > previousQValue) ? currentQValue : previousQValue;
+        lastActionFeatures = (currentQValue > previousQValue) ? currentFeatures : lastActionFeatures;
       }
-    }
 
     //List<PathNode> ret = new List<PathNode>();
     //ret.Add(choosenNode);
-    //return choosenNode;
-		return null;
+    return choosenNode;
+	//	return null;
   }
 
   protected float getQValue(float[] featuresValues) {
@@ -161,12 +174,12 @@ public class QPacman_Controller : PacMan_Controller {
       float distance = Vector3.Distance(node.Position, ghost.transform.position);
       min_ghost_distance = (distance < min_ghost_distance) ? distance : min_ghost_distance;
     }
-    Debug.Log("Distancia do Fantasma Mais Proximo: "+min_ghost_distance);
+    //Debug.Log("Distancia do Fantasma Mais Proximo: "+min_ghost_distance);
     featuresList.Add(min_ghost_distance);
 
     //Distancia da comida
     float food_distance = Vector3.Distance(node.Position, node.bfs_pellet_position());
-    Debug.Log("Distancia da COMIDA Mais Proxima: "+food_distance);
+    //Debug.Log("Distancia da COMIDA Mais Proxima: "+food_distance);
     featuresList.Add(food_distance);
 
 
@@ -182,14 +195,14 @@ public class QPacman_Controller : PacMan_Controller {
     }
 
      //Debug das duas listas
-    string L1 = "";string L2 = "";
+    /*string L1 = "";string L2 = "";
     foreach(float features in featuresList) {
       L1 += features.ToString()+" ";
     }
     foreach(float nFeatures in normalizedFeaturesList) {
       L2 += nFeatures.ToString()+" ";
     }
-    Debug.Log("Lista: "+L1+" | Normalizada: "+L2);
+    Debug.Log("Lista: "+L1+" | Normalizada: "+L2);*/
     
     float[] normalizedFeaturesArray = normalizedFeaturesList.ToArray();
     if (normalizedFeaturesArray.Length != NUM_FEATURES)
@@ -234,6 +247,50 @@ public class QPacman_Controller : PacMan_Controller {
 
     return tVal;
   }
+
+	protected void reward(float reward, float maxNextState) {
+		float correction = (reward + DISCOUNT_FACTOR * maxNextState);
+		string novosPesos = "";
+
+		for(int i = 0; i<NUM_FEATURES; i++) {
+			featuresWeights[i] = featuresWeights[i] + (LEARNING_RATE * (correction - featuresWeights[i]) * lastActionFeatures[i]);
+			novosPesos += featuresWeights[i] +" ";
+		}
+
+		Debug.Log("Recompensando: "+reward+" Novos Pesos "+novosPesos);
+	}
+
+	void OnTriggerEnter (Collider other) {
+		//Debug.Log("TRIGGER!!");
+		List<PathNode> nos = Global.nodes;
+		Vector3 position = other.gameObject.transform.position;
+		PathNode currentNode = Global.findClosestNode(position, nos);
+		
+		float maxQValue = float.MinValue;
+		foreach (PathNode conn in currentNode.ValidConnections) {
+			float[] currentFeatures = buildFeaturesList(conn);
+			float currentQValue = getQValue(currentFeatures);
+			maxQValue = (currentQValue > maxQValue) ? currentQValue : maxQValue;
+		}
+
+		//se o objeto era uma pelota
+		if (other.name.Contains("BasicPellet")) {
+			score += smallPelletScore;
+			reward(rewardPellet,maxQValue);
+		} 
+		//senao, se o objeto era uma superpelota
+		else if (other.name.Contains("SuperPellet")) {
+			score += superPelletScore;
+			reward(rewardSuperPellet,maxQValue);
+			//ative a invencibilidade do pacman
+			Global.UPGRADE = true;
+		}
+
+		
+		//destrua o objeto deste colisor
+		Destroy(other.gameObject);
+	}
+
 
 }
 
