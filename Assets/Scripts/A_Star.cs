@@ -74,7 +74,7 @@ public class A_Star {
 		
 		//encontre o melhor caminho ateh o proximo estado
 		bestPath = this.findBestPath(charState, nextState);
-		
+
 		//retorne o melhor caminho encontrado
 		return bestPath;
 	}
@@ -92,7 +92,7 @@ public class A_Star {
 	/// <param name='destinyNode'>
 	/// O no com as informacoes que representam o destino desejado.
 	/// </param>/
-	List<PathNode> findBestPath(PathNode charNode, PathNode destinyNode){
+	public List<PathNode> findBestPath(PathNode charNode, PathNode destinyNode){
 		
 		//lista para o conjunto de nos a ser avaliados
 		List<PathNode> openSet = new List<PathNode>();

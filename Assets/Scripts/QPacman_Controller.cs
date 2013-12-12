@@ -25,7 +25,7 @@ public class QPacman_Controller : PacMan_Controller {
 	protected float rewardPellet = 10f;
 	protected float rewardSuperPellet = 100f;
 	protected float rewardGhostKill = -5000f;
-	protected float rewardGhostFear = 500f;
+	protected float rewardGhostFear = 50f;
 
   new protected void Start() {
     ghosts = GameObject.FindGameObjectsWithTag("Respawn");
@@ -48,16 +48,26 @@ public class QPacman_Controller : PacMan_Controller {
 
     // se a IA esta ligada
     if (IA_ON) {
-			//bestNode = move();
-      if(bestNode == null ||
-        (Random.value > (1f - EXPLORATION_PROBABILITY))) {
-         // Debug.Log("Explorando");
-          bestNode = explore();
-      }
-      else {
-        //Debug.Log("Movendo");
-        bestNode = move();
-      }
+		//bestNode = move();
+		if(bestNode == null || (Time.time > nextUpdate && 
+			Vector3.Distance(pacMan.transform.position, lastNode.Position) < .3f)) {
+				if(!firstRun && !aStar.canReset(pacMan.transform)){
+					//coloque o pacman na posicao do ultimo no lido
+					pacMan.transform.position = lastNode.Position;
+				}
+
+				if(firstRun ||
+				   (Random.value > (1f - EXPLORATION_PROBABILITY))) {
+					// Debug.Log("Explorando");
+					bestNode = explore();
+					firstRun = false;
+				}
+				else {
+					//Debug.Log("Movendo");
+					bestNode = move();
+				}
+			}
+      
 
       //Debug.Log("Melhor Nodo "+bestNode.Position);
 
@@ -87,7 +97,12 @@ public class QPacman_Controller : PacMan_Controller {
 
       //mova o personagem na direcao do proximo ponto em funcao do tempo do ultimo frame
       controller.Move(moveDirection * Time.deltaTime);
-      //se a IA esta desligada, o usuario controla o pacman             
+      //se a IA esta desligada, o usuario controla o pacman
+			if(Vector3.Distance(controller.transform.position, lastNode.Position)<.3f){
+				//remova o primeiro no da lista
+				bestNode = null;	
+				
+			}
     }
     else {
 
@@ -169,9 +184,11 @@ public class QPacman_Controller : PacMan_Controller {
     //Distancia dos fantasmas
     float min_ghost_distance = float.MaxValue;
     foreach (GameObject ghost in ghosts) {
-      //current_a_star.findBestPath(this.lastNode, ghost.lastNode);
+			PathNode ghostNode = Global.findClosestNode(ghost.transform.position,Global.nodes);
+      List<PathNode> ghostPath = aStar.findBestPath(node, ghostNode);
       //distancia "
-      float distance = Vector3.Distance(node.Position, ghost.transform.position);
+      //float distance = Vector3.Distance(node.Position, ghost.transform.position);
+			float distance = (float) ghostPath.Count;
       min_ghost_distance = (distance < min_ghost_distance) ? distance : min_ghost_distance;
     }
     //Debug.Log("Distancia do Fantasma Mais Proximo: "+min_ghost_distance);
