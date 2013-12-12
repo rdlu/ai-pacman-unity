@@ -205,20 +205,21 @@ public class PathNode : System.IEquatable<PathNode> {
 				//Debug.Log("Comida Encontrada!");
 				return t;
 			}
-			foreach(PathNode connection in this.Connections) {
+			foreach(PathNode connection in t.ValidConnections) {
 				if(!V.Contains(connection)) {
 					V.Add(connection);
 					queue.Enqueue(connection);
 				}
 			}
 		}
+		//Debug.Log("Comida  NAO Encontrada!");
 		return null;
 	}
 	
 	public Vector3 bfs_pellet_position() {
 		PathNode candidate = bfs_pellet();
 		if(candidate == null)
-			return new Vector3(0f,0f,0f);
+			return new Vector3(90f,90f,90f);
 		else
 			return candidate.Position;
 	}

@@ -10,13 +10,12 @@ using System.Collections.Generic;
 [RequireComponent(typeof(CharacterController))]
 
 public class QPacman_Controller : PacMan_Controller {
-  public float EXPLORATION_PROBABILITY = 0.05f;
-  public float LEARNING_RATE = 0.3f;
-  public float DISCOUNT_FACTOR = 0.8f;
+  public float EXPLORATION_PROBABILITY = 0.1f;
+  public float LEARNING_RATE = 0.5f;
+  public float DISCOUNT_FACTOR = 0.9f;
 
   protected static int NUM_FEATURES = 2;
-
-  protected float[] featuresWeights = new float[NUM_FEATURES];
+	
   protected float[] lastActionFeatures;
   protected GameObject[] ghosts;
   protected PathNode bestNode = null;
@@ -24,8 +23,10 @@ public class QPacman_Controller : PacMan_Controller {
 	//Valor das recompensas
 	protected float rewardPellet = 10f;
 	protected float rewardSuperPellet = 100f;
-	protected float rewardGhostKill = -5000f;
+	protected float rewardGhostKill = 0f;
 	protected float rewardGhostFear = 50f;
+
+	protected bool help = false;
 
   new protected void Start() {
     ghosts = GameObject.FindGameObjectsWithTag("Respawn");
@@ -57,7 +58,7 @@ public class QPacman_Controller : PacMan_Controller {
 				}
 
 				if(firstRun ||
-				   (Random.value > (1f - EXPLORATION_PROBABILITY))) {
+				   (Random.value > (1f - EXPLORATION_PROBABILITY)) && !help) {
 					// Debug.Log("Explorando");
 					bestNode = explore();
 					firstRun = false;
@@ -66,6 +67,8 @@ public class QPacman_Controller : PacMan_Controller {
 					//Debug.Log("Movendo");
 					bestNode = move();
 				}
+
+				reward(-1f,0);
 			}
       
 
@@ -175,7 +178,7 @@ public class QPacman_Controller : PacMan_Controller {
   }
 
   protected float getQValue(float[] featuresValues) {
-    return featuresValues.Length == 0 ? float.MinValue : DotProduct(featuresWeights,featuresValues);
+    return featuresValues.Length == 0 ? float.MinValue : DotProduct(Global.featuresWeights,featuresValues);
   }
 
   //Monta uma nova lista com os valores das features
@@ -190,15 +193,29 @@ public class QPacman_Controller : PacMan_Controller {
       //float distance = Vector3.Distance(node.Position, ghost.transform.position);
 			float distance = (float) ghostPath.Count;
       min_ghost_distance = (distance < min_ghost_distance) ? distance : min_ghost_distance;
+
+			if(min_ghost_distance < 6f && !Global.UPGRADE) { 
+				help = true;
+				return new float[NUM_FEATURES];
+			}
     }
     //Debug.Log("Distancia do Fantasma Mais Proximo: "+min_ghost_distance);
     featuresList.Add(min_ghost_distance);
 
     //Distancia da comida
-    float food_distance = Vector3.Distance(node.Position, node.bfs_pellet_position());
+		PathNode nextFood = node.bfs_pellet();
+		float food_distance = float.MaxValue;
+
+		if(nextFood == null) {
+			food_distance = (float) Global.findClosestFoodPath(this.gameObject).Count;
+
+		} else {
+			food_distance = (float) aStar.findBestPath(node,nextFood).Count;
+		}
+
+		//float food_distance = Vector3.Distance(node.Position, node.bfs_pellet_position());
     //Debug.Log("Distancia da COMIDA Mais Proxima: "+food_distance);
     featuresList.Add(food_distance);
-
 
     //Normalizaçao retorna a porcentagem de participaçao da feature		
     List<float> normalizedFeaturesList = new List<float>();
@@ -270,8 +287,8 @@ public class QPacman_Controller : PacMan_Controller {
 		string novosPesos = "";
 
 		for(int i = 0; i<NUM_FEATURES; i++) {
-			featuresWeights[i] = featuresWeights[i] + (LEARNING_RATE * (correction - featuresWeights[i]) * lastActionFeatures[i]);
-			novosPesos += featuresWeights[i] +" ";
+			Global.featuresWeights[i] = Global.featuresWeights[i] + (LEARNING_RATE * (correction - Global.featuresWeights[i]) * lastActionFeatures[i]);
+			novosPesos += Global.featuresWeights[i] +" ";
 		}
 
 		Debug.Log("Recompensando: "+reward+" Novos Pesos "+novosPesos);
@@ -326,7 +343,7 @@ public class QPacman_Controller : PacMan_Controller {
 		if(Global.UPGRADE) {
 			reward(rewardGhostFear,maxQValue);
 		} else {
-			reward(rewardGhostKill,maxQValue);
+			//reward(rewardGhostKill,maxQValue);
 		}
 
 		base.Kill(col);

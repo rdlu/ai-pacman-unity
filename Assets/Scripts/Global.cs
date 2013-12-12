@@ -18,6 +18,8 @@ public class Global : MonoBehaviour {
 	public static bool UPGRADE;
 	//material usado para a aprencia dos fantasmas com medo
 	public static Material FEAR;
+	protected static int NUM_FEATURES = 2;
+	public static float[] featuresWeights = new float[NUM_FEATURES];
 	
 	//armazena a lsita dos colisores dos objetos de jogo dos fantasmas
 	public static List<Collider> ghostsColliders;
@@ -397,5 +399,35 @@ public class Global : MonoBehaviour {
 		//retorne o no
 		return node;
 		
+	}
+
+	public static List<PathNode> findClosestFoodPath(GameObject player) {
+		A_Star aStar = new A_Star(player.transform, true);
+
+		List<PathNode> bestPath = new List<PathNode>();
+
+		float pathCost = float.MaxValue;
+
+		foreach(PathNode node in nodes) {
+			if(node.Wall || node.Pellet == null)
+				continue;
+
+			aStar.NextState = node;
+
+			List<PathNode> thisPath = aStar.findBestPath();
+
+			float cost = (float) thisPath.Count;
+
+			if(cost < pathCost) {
+				pathCost = cost;
+				bestPath = thisPath;
+			}
+
+			if(pathCost <= 2f) {
+				return bestPath;
+			}
+		}
+
+		return bestPath;
 	}
 }
